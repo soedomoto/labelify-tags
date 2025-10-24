@@ -1,19 +1,15 @@
-name: Publish to npm
+name: Publish to NPM
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [created]  # Triggers on new release creation (e.g., v1.0.0 tag)
 
 jobs:
   publish:
-    name: Publish Package
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
-      id-token: write
-      packages: write
+      id-token: write  # Required for provenance (optional, for signed builds)
 
     steps:
       - name: Checkout code
@@ -35,13 +31,6 @@ jobs:
 
       - name: Build package
         run: pnpm run build
-
-      - name: Verify npm authentication
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          echo "Verifying npm authentication..."
-          npm whoami
 
       - name: Publish to npm
         env:
