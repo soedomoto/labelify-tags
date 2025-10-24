@@ -1,15 +1,16 @@
 name: Publish to NPM
 
 on:
-  release:
-    types: [created]  # Triggers on new release creation (e.g., v1.0.0 tag) 
+  push:
+    branches:
+      - main
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for provenance (optional, for signed builds)
+      id-token: write
 
     steps:
       - name: Checkout code
