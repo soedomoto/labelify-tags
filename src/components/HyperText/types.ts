@@ -2,6 +2,7 @@ import { HTMLAttributes } from "react";
 import { BaseStoreState } from "../Base/types";
 
 export type HyperTextProps = HTMLAttributes<HTMLDivElement> & {
+  id: string;
   value?: string;
   name?: string;
   style?: string;

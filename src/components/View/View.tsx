@@ -1,5 +1,4 @@
 import { htmlStyleToReactStyle } from '@/.';
-import { randomId } from '@mantine/hooks';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { ViewProps, ViewState, viewStore } from '.';
 
@@ -13,13 +12,13 @@ function Component({ id }: { id: string }) {
   return <div style={state?.reactStyle} {...(state?.props || {})}>{state?.children}</div>;
 }
 
-export function View({ style, children, ...props }: PropsWithChildren<ViewProps>) {
-  const id = randomId('HyperView-');
+export function View({ id, style, children, ...props }: PropsWithChildren<ViewProps>) {
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
 
   useEffect(() => {
       viewStore.register(id, {
         type: 'View',
+        id,
         reactStyle,
         props,
         children,

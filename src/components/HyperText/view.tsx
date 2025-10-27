@@ -1,5 +1,4 @@
 import { htmlStyleToReactStyle } from '@/.';
-import { randomId } from '@mantine/hooks';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { HyperTextProps, HyperTextState, hyperTextStore } from '.';
 
@@ -13,13 +12,13 @@ function Component({ id }: { id: string }) {
   return <div style={state?.reactStyle} {...(state?.props || {})}>{state?.children}</div>;
 }
 
-export function HyperText({ style, value, name, children, ...props }: PropsWithChildren<HyperTextProps>) {
-  const id = randomId('HyperText-');
+export function HyperText({ id, style, value, name, children, ...props }: PropsWithChildren<HyperTextProps>) {
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
 
   useEffect(() => {
     hyperTextStore.register(id, {
       type: 'HyperText',
+      id, 
       value,
       name,
       reactStyle,
