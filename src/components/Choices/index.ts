@@ -1,4 +1,4 @@
-import { ComponentStoreInterface, Registry } from '@/.';
+import { ComponentStoreInterface, Registry } from '../Registry';
 import { ChoicesStore, choicesStore } from './model';
 import { ChoicesProps } from './types';
 import { Choices } from './view';

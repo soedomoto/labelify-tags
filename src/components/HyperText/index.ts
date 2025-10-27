@@ -1,4 +1,7 @@
-import { Registry, HyperTextStore, HyperTextProps, hyperTextStore, HyperText, ComponentStoreInterface } from '@/.';
+import { ComponentStoreInterface, Registry } from '../Registry';
+import { hyperTextStore, HyperTextStore } from './model';
+import { HyperTextProps } from './types';
+import { HyperText } from './view';
 
 Registry.registerComponent<HyperTextStore, HyperTextProps>({
   tag: 'HyperText',

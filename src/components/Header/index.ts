@@ -1,4 +1,7 @@
-import { HeaderProps, Registry, HeaderStore, headerStore, Header, ComponentStoreInterface } from '@/.';
+import { ComponentStoreInterface, Registry } from '../Registry';
+import { headerStore, HeaderStore } from './model';
+import { HeaderProps } from './types';
+import { Header } from './view';
 
 Registry.registerComponent<HeaderStore, HeaderProps>({
   tag: 'Header',

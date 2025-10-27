@@ -1,4 +1,7 @@
-import { Registry, ViewStore, ViewProps, viewStore, View, ComponentStoreInterface } from '@/.';
+import { ComponentStoreInterface, Registry } from '../Registry';
+import { viewStore, ViewStore } from './model';
+import { ViewProps } from './types';
+import { View } from './view';
 
 Registry.registerComponent<ViewStore, ViewProps>({
   tag: 'View',

@@ -1,4 +1,8 @@
-import { Registry, TextStore, TextProps, textStore, Text, ComponentStoreInterface } from '@/.';
+import { ComponentStoreInterface, Registry } from '../Registry';
+import { textStore, TextStore } from './model';
+import { TextProps } from './types';
+import { Text } from './view';
+
 
 Registry.registerComponent<TextStore, TextProps>({
   tag: 'Text',
