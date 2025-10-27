@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode } from "react";
 
-export type SupportedTypes = 'View' | 'Text' | 'Header' | 'HyperText' | 'Label' | 'Choices' | 'Choice';
+export type SupportedTypes = 'View' | 'Text' | 'Header' | 'HyperText' | 'Label' | 'Choices' | 'Choice' | 'TextArea';
 
 export type BaseStoreState = {
   type: SupportedTypes

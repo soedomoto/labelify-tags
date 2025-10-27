@@ -9,3 +9,4 @@ export * from "./components/Text";
 export * from "./components/HyperText";
 export * from "./components/Choices";
 export * from "./components/Choice";
+export * from "./components/TextArea";
