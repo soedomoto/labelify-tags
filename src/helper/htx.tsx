@@ -52,14 +52,14 @@ function renderHtxElement(element: HtxElement, values: Record<string, any> = {},
     reactChildren = children;
   }
 
-  console.log(`Rendering element: ${type}`, id, parentId, props, reactChildren.length);
+  // console.log(`Rendering element: ${type}`, id, parentId, props, reactChildren.length);
   return createElement(view, { key, ...props }, reactChildren);
 }
 
 export function renderHtxString(htxString: string, values: Record<string, any> = {}): React.ReactNode {
-  console.log("Rendering HTX string:", htxString);
+  // console.log("Rendering HTX string:", htxString);
   const elements = parseHtxString(htxString);
-  console.log("Parsed HTX elements:", elements);
+  // console.log("Parsed HTX elements:", elements);
   return (
     <MantineProvider>
       {elements.map((e, idx) => renderHtxElement(e, values, idx))}
