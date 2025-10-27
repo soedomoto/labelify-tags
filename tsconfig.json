@@ -4,7 +4,7 @@
     "module": "ESNext",
     "declaration": true,
     "declarationDir": "dist/types",
-    "emitDeclarationOnly": false,
+    "emitDeclarationOnly": true,
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "isolatedModules": true,
@@ -18,5 +18,5 @@
     },
     "outDir": "dist"
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

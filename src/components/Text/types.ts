@@ -1,0 +1,10 @@
+import { HTMLAttributes } from "react";
+import { BaseStoreState } from "../Base/types";
+
+export type TextProps = HTMLAttributes<HTMLDivElement> & {
+  value?: string;
+  name?: string;
+  style?: string;
+}
+
+export type TextState = BaseStoreState & TextProps

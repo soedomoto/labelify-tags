@@ -1,73 +1,17 @@
-/**
- * ZRegistry - Zustand Component Registry System
- *
- * A modern registry system for managing Zustand-based components,
- * replacing the MST-based Registry for new component implementations.
- * Provides a unified way to register, discover, and manage Zustand stores
- * and their corresponding React components.
- */
-
 import { JSX, useEffect, useState } from 'react';
 
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-/**
- * Metadata about a Zustand store
- */
-export interface ZustandStoreMetadata {
-  /** Unique identifier for the store */
-  name: string;
-
-  /** Human-readable description */
-  description?: string;
-
-  /** Version of the store implementation */
-  version?: string;
-
-  /** Author or maintainer */
-  author?: string;
-
-  /** Tags for categorization */
-  tags?: string[];
-
-  /** Custom metadata */
-  metadata?: Record<string, unknown>;
-}
-
-/**
- * Configuration for a Zustand-based component
- */
 export interface ZComponentDefinition<TStore = Record<string, unknown>, TViewProps = unknown> {
-  /** Component tag name (e.g., 'zlabels', 'zbutton') */
   tag: string;
-
-  /** Store metadata and information */
-  store: ZustandStoreMetadata & {
-    /** The Zustand hook/store creator */
-    hook: () => TStore;
-  };
-
-  /** React component that uses the store */
+  store: TStore;
   view: React.ComponentType<TViewProps>;
 
-  /** Configuration and initialization */
   config?: {
-    /** Whether this is an object type */
     isObject?: boolean;
-
-    /** Auto-initialize on mount */
     autoInit?: boolean;
-
-    /** Default props to apply */
     defaultProps?: Partial<TViewProps>;
-
-    /** Custom detector function for type detection */
     detector?: (value: unknown) => boolean;
   };
 
-  /** Region configuration (for annotation areas) */
   region?: {
     name: string;
     nodeView?: {
@@ -78,82 +22,49 @@ export interface ZComponentDefinition<TStore = Record<string, unknown>, TViewPro
     };
   };
 
-  /** Custom hooks or middleware */
   middleware?: {
-    /** Pre-render hook */
     beforeRender?: (props: unknown) => void;
-
-    /** Post-render hook */
     afterRender?: (props: unknown) => void;
-
-    /** Cleanup hook */
     cleanup?: () => void;
   };
 }
 
-/**
- * Registered component with resolved information
- */
-export interface RegisteredZComponent<TStore = Record<string, unknown>, TViewProps = unknown> {
+export interface RegisteredComponent<TStore = () => any, TViewProps = unknown> {
   tag: string;
-  store: ZustandStoreMetadata & { hook: () => TStore };
+  store: TStore;
   view: React.ComponentType<TViewProps>;
   config?: ZComponentDefinition['config'];
   region?: ZComponentDefinition['region'];
   middleware?: ZComponentDefinition['middleware'];
 }
 
-/**
- * Registry statistics and information
- */
 export interface RegistryStats {
   totalComponents: number;
   totalStores: number;
   components: string[];
-  storesInfo: Array<{
-    name: string;
-    tag: string;
-    description?: string;
-  }>;
 }
 
-// ============================================================================
-// REGISTRY CLASS
-// ============================================================================
-
-/**
- * ZRegistry - Zustand Component Registry
- *
- * Manages registration and discovery of Zustand-based components.
- * Provides a centralized registry for all modern (non-MST) components.
- */
-export class _ZRegistry {
-  private components = new Map<string, RegisteredZComponent<any, any>>();
-  private stores = new Map<string, ZustandStoreMetadata & { hook: () => any }>();
+export class _Registry {
+  private components = new Map<string, RegisteredComponent<any, any>>();
+  private stores = new Map<string, () => any>();
   private regions: any[] = [];
   private objects: any[] = [];
   private areas = new Map<string, any[]>();
   private perRegionViews = new Map<string, Map<string, React.ComponentType>>();
   private tools = new Map<string, any>();
 
-  // Hooks for lifecycle events
   private listeners = new Set<(event: RegistryEvent) => void>();
 
-  /**
-   * Register a Zustand-based component
-   */
-  registerComponent<TStore = Record<string, unknown>, TViewProps = unknown>(
+  registerComponent<TStore = () => any, TViewProps = unknown>(
     definition: ZComponentDefinition<TStore, TViewProps>,
   ): void {
     const normalizedTag = definition.tag.toLowerCase();
 
-    // Validate
     if (this.components.has(normalizedTag)) {
       console.warn(`Component '${normalizedTag}' is already registered. Overwriting...`);
     }
 
-    // Register component
-    const registeredComponent: RegisteredZComponent<TStore, TViewProps> = {
+    const registeredComponent: RegisteredComponent<TStore, TViewProps> = {
       tag: normalizedTag,
       store: definition.store,
       view: definition.view,
@@ -162,22 +73,18 @@ export class _ZRegistry {
       middleware: definition.middleware as any,
     };
 
-    this.components.set(normalizedTag, registeredComponent as RegisteredZComponent<any, any>);
+    this.components.set(normalizedTag, registeredComponent as RegisteredComponent<any, any>);
 
-    // Register store separately
     this.stores.set(definition.store.name, definition.store);
 
-    // Register object type if specified
     if (definition.config?.isObject) {
       this.objects.push(definition.store);
     }
 
-    // Register region if specified
     if (definition.region) {
       this.addRegionType(definition.region, definition.store.name, definition.config?.detector);
     }
 
-    // Emit event
     this.emit({
       type: 'component-registered',
       tag: normalizedTag,
@@ -185,18 +92,12 @@ export class _ZRegistry {
     });
   }
 
-  /**
-   * Register multiple components at once
-   */
   registerComponents<T extends readonly ZComponentDefinition[]>(...definitions: T): void {
     for (const definition of definitions) {
       this.registerComponent(definition);
     }
   }
 
-  /**
-   * Unregister a component
-   */
   unregisterComponent(tag: string): boolean {
     const normalizedTag = tag.toLowerCase();
     const removed = this.components.delete(normalizedTag);
@@ -212,64 +113,43 @@ export class _ZRegistry {
     return removed;
   }
 
-  /**
-   * Get a registered component by tag
-   */
-  getComponent<TStore = Record<string, unknown>, TViewProps = unknown>(
+  getComponent<TStore = () => any, TViewProps = unknown>(
     tag: string,
-  ): RegisteredZComponent<TStore, TViewProps> {
+  ): RegisteredComponent<TStore, TViewProps> {
     const normalizedTag = tag.toLowerCase();
     const component = this.components.get(normalizedTag);
 
-    if (!component) {
-      const available = Array.from(this.components.keys());
-      throw new Error(
-        `Component '${normalizedTag}' not registered.\nAvailable: ${available.join(', ') || 'none'}`,
-      );
-    }
+    // if (!component) {
+    //   const available = Array.from(this.components.keys());
+    //   throw new Error(
+    //     `Component '${normalizedTag}' not registered.\nAvailable: ${available.join(', ') || 'none'}`,
+    //   );
+    // }
 
-    return component as RegisteredZComponent<TStore, TViewProps>;
+    return component as RegisteredComponent<TStore, TViewProps>;
   }
 
-  /**
-   * Get component's React view
-   */
   getComponentView(tag: string): React.ComponentType {
-    return this.getComponent(tag).view;
+    return this.getComponent(tag)?.view;
   }
 
-  /**
-   * Get component's store hook
-   */
   getComponentStore(tag: string): () => any {
-    return this.getComponent(tag).store.hook;
+    return this.getComponent(tag)?.store
   }
 
-  /**
-   * Check if component is registered
-   */
   hasComponent(tag: string): boolean {
     return this.components.has(tag.toLowerCase());
   }
 
-  /**
-   * Get all registered components
-   */
-  getAllComponents(): RegisteredZComponent[] {
+  getAllComponents(): RegisteredComponent[] {
     return Array.from(this.components.values());
   }
 
-  /**
-   * Get component tags
-   */
   getComponentTags(): string[] {
     return Array.from(this.components.keys());
   }
 
-  /**
-   * Get a store by name
-   */
-  getStore(name: string): ZustandStoreMetadata & { hook: () => any } {
+  getStore(name: string): () => any {
     const store = this.stores.get(name);
 
     if (!store) {
@@ -282,16 +162,10 @@ export class _ZRegistry {
     return store;
   }
 
-  /**
-   * Get all registered stores
-   */
-  getAllStores(): Array<ZustandStoreMetadata & { hook: () => any }> {
+  getAllStores(): Array<() => any> {
     return Array.from(this.stores.values());
   }
 
-  /**
-   * Add a region type
-   */
   private addRegionType(type: any, object: string, detector?: (value: unknown) => boolean): void {
     if (detector) {
       type.detectByValue = detector;
@@ -307,16 +181,10 @@ export class _ZRegistry {
     }
   }
 
-  /**
-   * Get all region types
-   */
   getRegionTypes(): any[] {
     return [...this.regions];
   }
 
-  /**
-   * Get available areas for an object
-   */
   getAvailableAreas(objectName: string, value?: unknown): any[] {
     const available = this.areas.get(objectName);
 
@@ -333,16 +201,10 @@ export class _ZRegistry {
     return available.filter((a) => !a.detectByValue);
   }
 
-  /**
-   * Get all object types
-   */
   getObjectTypes(): any[] {
     return [...this.objects];
   }
 
-  /**
-   * Add a per-region view
-   */
   addPerRegionView(tag: string, mode: string, view: React.ComponentType): void {
     const normalizedTag = tag.toLowerCase();
     let tagViews = this.perRegionViews.get(normalizedTag);
@@ -355,17 +217,11 @@ export class _ZRegistry {
     tagViews.set(mode, view);
   }
 
-  /**
-   * Get per-region view
-   */
   getPerRegionView(tag: string, mode: string): React.ComponentType | undefined {
     const normalizedTag = tag.toLowerCase();
     return this.perRegionViews.get(normalizedTag)?.get(mode);
   }
 
-  /**
-   * Register a tool
-   */
   registerTool(name: string, model: any): void {
     this.tools.set(name, model);
     this.emit({
@@ -375,9 +231,6 @@ export class _ZRegistry {
     });
   }
 
-  /**
-   * Get a tool
-   */
   getTool(name: string): any {
     const tool = this.tools.get(name);
 
@@ -391,9 +244,6 @@ export class _ZRegistry {
     return tool;
   }
 
-  /**
-   * Get all tools
-   */
   getAllTools(): Record<string, any> {
     const result: Record<string, any> = {};
     for (const [name, tool] of this.tools) {
@@ -402,25 +252,14 @@ export class _ZRegistry {
     return result;
   }
 
-  /**
-   * Get registry statistics
-   */
   getStats(): RegistryStats {
     return {
       totalComponents: this.components.size,
       totalStores: this.stores.size,
       components: this.getComponentTags(),
-      storesInfo: Array.from(this.stores.values()).map((store) => ({
-        name: store.name,
-        tag: this.components.get(store.name)?.tag || 'N/A',
-        description: store.description,
-      })),
     };
   }
 
-  /**
-   * Clear the registry
-   */
   clear(): void {
     this.components.clear();
     this.stores.clear();
@@ -435,9 +274,6 @@ export class _ZRegistry {
     });
   }
 
-  /**
-   * Export registry state for debugging
-   */
   export(): {
     components: Array<{
       tag: string;
@@ -458,11 +294,6 @@ export class _ZRegistry {
     };
   }
 
-  // ====== EVENT SYSTEM ======
-
-  /**
-   * Subscribe to registry events
-   */
   subscribe(listener: (event: RegistryEvent) => void): () => void {
     this.listeners.add(listener);
     return () => {
@@ -470,9 +301,6 @@ export class _ZRegistry {
     };
   }
 
-  /**
-   * Emit a registry event
-   */
   private emit(event: RegistryEvent): void {
     for (const listener of this.listeners) {
       try {
@@ -484,49 +312,35 @@ export class _ZRegistry {
   }
 }
 
-/**
- * Registry event types
- */
 export type RegistryEvent =
   | {
-      type: 'component-registered';
-      tag: string;
-      timestamp: number;
-    }
+    type: 'component-registered';
+    tag: string;
+    timestamp: number;
+  }
   | {
-      type: 'component-unregistered';
-      tag: string;
-      timestamp: number;
-    }
+    type: 'component-unregistered';
+    tag: string;
+    timestamp: number;
+  }
   | {
-      type: 'tool-registered';
-      name: string;
-      timestamp: number;
-    }
+    type: 'tool-registered';
+    name: string;
+    timestamp: number;
+  }
   | {
-      type: 'registry-cleared';
-      timestamp: number;
-    };
+    type: 'registry-cleared';
+    timestamp: number;
+  };
 
-// ============================================================================
-// SINGLETON INSTANCE
-// ============================================================================
+export const Registry = new _Registry();
 
-export const ZRegistry = new _ZRegistry();
-
-// ============================================================================
-// HOOKS FOR REACT COMPONENTS
-// ============================================================================
-
-/**
- * Hook to access registry and trigger re-renders on changes
- */
-export function useZRegistry(): _ZRegistry {
+export function useZRegistry(): _Registry {
   const [, setTrigger] = useState({});
 
   useEffect(() => {
     const listener = () => setTrigger({});
-    const unsubscribe = ZRegistry.subscribe(() => {
+    const unsubscribe = Registry.subscribe(() => {
       listener();
     });
 
@@ -535,34 +349,24 @@ export function useZRegistry(): _ZRegistry {
     };
   }, []);
 
-  return ZRegistry;
+  return Registry;
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-/**
- * Create a batch registration helper
- */
 export function createRegistrationBatch<T extends readonly ZComponentDefinition[]>(
   ...definitions: T
 ): { register: () => void; components: T } {
   return {
     components: definitions,
     register: () => {
-      ZRegistry.registerComponents(...definitions);
+      Registry.registerComponents(...definitions);
     },
   };
 }
 
-/**
- * Helper to create a component definition
- */
 export function defineZComponent<TStore = Record<string, unknown>, TViewProps = unknown>(
   config: ZComponentDefinition<TStore, TViewProps>,
 ): ZComponentDefinition<TStore, TViewProps> {
   return config;
 }
 
-export default ZRegistry;
+export default Registry;
