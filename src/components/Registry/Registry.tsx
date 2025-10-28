@@ -159,7 +159,7 @@ class CRegistry {
     return Object.keys(this.store.get(this.components));
   }
 
-  getInstancesValues() {
+  public getInstancesValues() {
     let values: Record<string, unknown> = {};
     const components = this.getAllComponents();
     for (const comp of components) {
