@@ -23,15 +23,6 @@ export interface BaseControlProps extends BaseObjectProps {
   toName: string;
 }
 
-export interface InstanceValue {
-  value: Record<string, any>;
-  id: string;
-  from_name: string;
-  to_name: string;
-  type: string;
-  origin: string;
-}
-
 export interface BaseControlState extends BaseObjectState, BaseControlProps {
   getFormattedValue: () => Record<string, any>;
 }
@@ -189,8 +180,55 @@ class CRegistry {
     return Object.keys(this.store.get(this.components));
   }
 
+  public subscribeInstancesChanges(callback: (instances: Record<string, {
+    value: Record<string, any>;
+    id: string;
+    from_name: string;
+    to_name: string;
+    type: string;
+    origin: string;
+  }>) => void): () => void {
+    return this.store.sub(this.components, () => {
+      const components = this.store.get(this.components);
+      const allInstances: Record<string, {
+        value: Record<string, any>;
+        id: string;
+        from_name: string;
+        to_name: string;
+        type: string;
+        origin: string;
+      }> = {};
+      for (const key of Object.keys(components)) {
+        const store = components[key].store;
+        const instances = this.store.get(store.instances);
+        for (const instanceKey of Object.keys(instances)) {
+          store.subscribe(instanceKey, (s) => {
+            const state = s as BaseControlState;
+            allInstances[instanceKey] = {
+              "value": state.getFormattedValue(),
+              "id": randomId(),
+              "from_name": state.name,
+              "to_name": state.toName,
+              "type": components[key].tag.toLowerCase(),
+              "origin": "manual"
+            };
+            callback(allInstances);
+          });
+        }
+      }
+      callback(allInstances);
+    });
+  }
+
   public getInstancesValues() {
-    let values: Record<string, InstanceValue> = {};
+    let values: Record<string, {
+      value: Record<string, any>;
+      id: string;
+      from_name: string;
+      to_name: string;
+      type: string;
+      origin: string;
+    }> = {};
     const components = this.getAllComponents();
     for (const comp of components) {
       if (!comp?.config?.isControl) continue;

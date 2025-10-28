@@ -67,6 +67,5 @@ export function renderHtxString(htxString: string, values: Record<string, any> =
   );
 }
 
-export function getInstancesValues() {
-  return Registry.getInstancesValues();
-};
+export const getInstancesValues = Registry.getInstancesValues;
+export const subscribeInstancesChanges = Registry.subscribeInstancesChanges;
