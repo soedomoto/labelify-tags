@@ -23,6 +23,15 @@ export interface BaseControlProps extends BaseObjectProps {
   toName: string;
 }
 
+export interface InstanceValue {
+  value: Record<string, any>;
+  id: string;
+  from_name: string;
+  to_name: string;
+  type: string;
+  origin: string;
+}
+
 export interface BaseControlState extends BaseObjectState, BaseControlProps {
   getFormattedValue: () => Record<string, any>;
 }
@@ -181,14 +190,7 @@ class CRegistry {
   }
 
   public getInstancesValues() {
-    let values: Record<string, {
-      value: Record<string, any>;
-      id: string;
-      from_name: string;
-      to_name: string;
-      type: string;
-      origin: string;
-    }> = {};
+    let values: Record<string, InstanceValue> = {};
     const components = this.getAllComponents();
     for (const comp of components) {
       if (!comp?.config?.isControl) continue;
@@ -203,20 +205,3 @@ class CRegistry {
 }
 
 export const Registry = new CRegistry();
-
-// export function useRegistry(): _Registry {
-//   const [, setTrigger] = useState({});
-
-//   useEffect(() => {
-//     const listener = () => setTrigger({});
-//     const unsubscribe = Registry.subscribe(() => {
-//       listener();
-//     });
-
-//     return () => {
-//       unsubscribe();
-//     };
-//   }, []);
-
-//   return Registry;
-// }
