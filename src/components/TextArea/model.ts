@@ -1,6 +1,6 @@
 import { TextAreaState } from '.';
 import { SupportedTypes } from '../Base/types';
-import { ComponentStore } from '../Registry';
+import { AbstractComponentStore } from '../Registry';
 
 type TextAreaActions = {
   register(id: string, state: TextAreaState): () => void
@@ -17,7 +17,7 @@ const createInitialState = (): TextAreaState => ({
   visible: true,
 });
 
-export const textAreaStore = (new class StoreClass<TViewStore = TextAreaState> extends ComponentStore<TViewStore> {
+export const textAreaStore = (new class StoreClass<TViewStore = TextAreaState> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }

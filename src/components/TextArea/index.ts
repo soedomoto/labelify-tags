@@ -1,4 +1,4 @@
-import { ComponentStoreInterface, Registry } from '../Registry';
+import { ComponentStore, Registry } from '../Registry';
 import { textAreaStore, TextAreaStore } from './model';
 import { TextAreaProps } from './types';
 import { TextArea } from './view';
@@ -6,7 +6,7 @@ import { TextArea } from './view';
 
 Registry.registerComponent<TextAreaStore, TextAreaProps>({
   tag: 'TextArea',
-  store: textAreaStore as unknown as ComponentStoreInterface<TextAreaStore>,
+  store: textAreaStore as unknown as ComponentStore<TextAreaStore>,
   view: TextArea,
   config: {
     isControl: true,

@@ -1,6 +1,6 @@
 import { HyperTextState } from '.';
 import { SupportedTypes } from '../Base/types';
-import { ComponentStore } from '../Registry';
+import { AbstractComponentStore } from '../Registry';
 
 type HyperTextActions = {
   register(id: string, state: HyperTextState): () => void
@@ -17,7 +17,7 @@ const createInitialState = (): HyperTextState => ({
   visible: true,
 });
 
-export const hyperTextStore = (new class StoreClass<TViewStore = HyperTextState> extends ComponentStore<TViewStore> {
+export const hyperTextStore = (new class StoreClass<TViewStore = HyperTextState> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }

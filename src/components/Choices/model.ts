@@ -1,6 +1,6 @@
 import { ChoicesState } from '.';
 import { SupportedTypes } from '../Base/types';
-import { ComponentStore } from '../Registry';
+import { AbstractComponentStore } from '../Registry';
 
 type ChoicesActions = {
   register(id: string, state: ChoicesState): () => void
@@ -17,7 +17,7 @@ const createInitialState = (): ChoicesState => ({
   visible: true,
 });
 
-export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> extends ComponentStore<TViewStore> {
+export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }

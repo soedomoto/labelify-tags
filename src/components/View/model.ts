@@ -1,6 +1,6 @@
 import { ViewState } from '.';
 import { SupportedTypes } from '../Base/types';
-import { ComponentStore } from '../Registry';
+import { AbstractComponentStore } from '../Registry';
 
 type ViewActions = {
   register(id: string, state: ViewState): () => void
@@ -17,7 +17,7 @@ const createInitialState = (): ViewState => ({
   visible: true,
 });
 
-export const viewStore = (new class StoreClass<TViewStore = ViewState> extends ComponentStore<TViewStore> {
+export const viewStore = (new class StoreClass<TViewStore = ViewState> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }

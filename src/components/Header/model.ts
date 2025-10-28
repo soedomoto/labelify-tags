@@ -1,6 +1,6 @@
 import { HeaderState } from '.';
 import { SupportedTypes } from '../Base/types';
-import { ComponentStore } from '../Registry';
+import { AbstractComponentStore } from '../Registry';
 
 type HeaderActions = {
   register(id: string, state: HeaderState): () => void
@@ -17,7 +17,7 @@ const createInitialState = (): HeaderState => ({
   visible: true,
 });
 
-export const headerStore = (new class StoreClass<TViewStore = HeaderState> extends ComponentStore<TViewStore> {
+export const headerStore = (new class StoreClass<TViewStore = HeaderState> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }

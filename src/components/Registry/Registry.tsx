@@ -3,7 +3,7 @@ import { ComponentType, JSX } from "react";
 import { SupportedTypes } from "../Base/types";
 import merge from "lodash/merge";
 
-export interface ComponentStoreInterface<TViewStore> {
+export interface ComponentStore<TViewStore = unknown> {
   type: SupportedTypes;
   instances: PrimitiveAtom<Record<string, TViewStore>>;
 
@@ -11,8 +11,16 @@ export interface ComponentStoreInterface<TViewStore> {
   unregister(id: string): void;
   getInstance(id: string): TViewStore | undefined;
   subscribe(id: string, callback: (state: TViewStore | undefined) => void): () => void;
+  getInstanceKeys(): string[];
+  getInstances(): (TViewStore | undefined)[]
 }
-export class ComponentStore<TViewStore> implements ComponentStoreInterface<TViewStore> {
+export abstract class AbstractComponentStore<TViewStore> implements ComponentStore<TViewStore> {
+  getInstanceKeys(): string[] {
+    throw new Error("Method not implemented.");
+  }
+  getInstances(): (TViewStore | undefined)[] {
+    throw new Error("Method not implemented.");
+  }
   public type: SupportedTypes = 'View';
   public instances = atom<Record<string, TViewStore>>({});
 
@@ -32,11 +40,17 @@ export class ComponentStore<TViewStore> implements ComponentStoreInterface<TView
   subscribe(id: string, callback: (state: TViewStore | undefined) => void): () => void {
     throw new Error('Method not implemented.');
   }
+  getinstanceKeys(): string[] {
+    throw new Error("Method not implemented.");
+  }
+  getinstances(): (TViewStore | undefined)[] {
+    throw new Error("Method not implemented.");
+  }
 }
 
 export interface ComponentDefinition<TViewStore = unknown, TViewProps = unknown> {
   tag: string;
-  store: ComponentStoreInterface<TViewStore>;
+  store: ComponentStore<TViewStore>;
   view: ComponentType<TViewProps>;
 
   config?: {
@@ -137,8 +151,27 @@ class CRegistry {
     return Object.values(this.store.get(this.components));
   }
 
+  getAllComponentStores(): ComponentStore[] {
+    return Object.values(this.store.get(this.stores));
+  }
+
   getComponentTags(): string[] {
     return Object.keys(this.store.get(this.components));
+  }
+
+  getInstancesValues() {
+    let values: Record<string, unknown> = {};
+    const components = this.getAllComponents();
+    for (const comp of components) {
+      if (!comp?.config?.isControl) continue;
+
+      for (const instance of comp?.store?.getInstances()) {
+        // @ts-expect-error ts-ignore
+        values[instance?.id || ''] = instance?.value;
+      }
+    }
+
+    return values;
   }
 }
 

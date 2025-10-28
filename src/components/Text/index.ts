@@ -1,4 +1,4 @@
-import { ComponentStoreInterface, Registry } from '../Registry';
+import { ComponentStore, Registry } from '../Registry';
 import { textStore, TextStore } from './model';
 import { TextProps } from './types';
 import { Text } from './view';
@@ -6,7 +6,7 @@ import { Text } from './view';
 
 Registry.registerComponent<TextStore, TextProps>({
   tag: 'Text',
-  store: textStore as unknown as ComponentStoreInterface<TextStore>,
+  store: textStore as unknown as ComponentStore<TextStore>,
   view: Text,
   config: {
     isObject: false,

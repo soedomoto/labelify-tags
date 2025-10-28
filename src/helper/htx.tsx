@@ -66,3 +66,5 @@ export function renderHtxString(htxString: string, values: Record<string, any> =
     </MantineProvider>
   );
 }
+
+export const getInstancesValues = Registry.getInstancesValues;
