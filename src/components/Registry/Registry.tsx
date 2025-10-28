@@ -1,6 +1,7 @@
 import { atom, createStore, PrimitiveAtom } from "jotai";
 import { ComponentType, JSX } from "react";
 import { SupportedTypes } from "../Base/types";
+import merge from "lodash/merge";
 
 export interface ComponentStoreInterface<TViewStore> {
   type: SupportedTypes;
@@ -39,6 +40,7 @@ export interface ComponentDefinition<TViewStore = unknown, TViewProps = unknown>
   view: ComponentType<TViewProps>;
 
   config?: {
+    isControl?: boolean;
     isObject?: boolean;
     autoInit?: boolean;
     defaultProps?: Partial<TViewProps>;
@@ -96,7 +98,7 @@ class CRegistry {
     }
 
     this.store.set(this.components, (components) => {
-      return {...components, [normalizedTag]: definition as ComponentDefinition<any, any> };
+      return { ...components, [normalizedTag]: merge({ config: { isControl: false } }, definition) as ComponentDefinition<any, any> };
     });
 
     this.store.set(this.stores, (stores) => {

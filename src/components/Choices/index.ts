@@ -8,6 +8,7 @@ Registry.registerComponent<ChoicesStore, ChoicesProps>({
   store: choicesStore as unknown as ComponentStoreInterface<ChoicesStore>,
   view: Choices,
   config: {
+    isControl: true,
     isObject: false,
     autoInit: true,
   },

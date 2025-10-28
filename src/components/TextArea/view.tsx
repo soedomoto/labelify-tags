@@ -17,6 +17,10 @@ function Component({ id }: { id: string }) {
     minRows={1}
     maxRows={state?.rows}
     style={state?.reactStyle}
+    value={state?.value}
+    onChange={(e) => {
+      if (state) state.value = e.target.value;
+    }}
   />;
 }
 

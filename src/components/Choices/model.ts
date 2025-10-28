@@ -51,7 +51,7 @@ export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> ext
 
   setValues(id: string, key: string, value: string) {
     this.store.set(this.instances, (instances: Record<string, TViewStore>) => {
-      let values = [...((instances[key] as ChoicesState)?.values || []), value];
+      let values = [...((instances[key] as ChoicesState)?.value || []), value];
       if ((instances[key] as ChoicesState)?.choice === 'single') {
         values = [value];
       }
@@ -60,7 +60,7 @@ export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> ext
           ...instances,
           [id]: {
             ...instances[id],
-            values,
+            value: values,
           } as TViewStore,
         };
     });

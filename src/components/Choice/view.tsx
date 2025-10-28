@@ -18,7 +18,7 @@ function Component({ id }: { id: string }) {
     }
   }, [state?.parentId]);
 
-  const [value] = pState?.values || [];
+  const [value] = pState?.value || [];
 
   return (
     <Checkbox
@@ -26,7 +26,7 @@ function Component({ id }: { id: string }) {
       ml={33}
       label={state?.value || state?.children}
       key={state?.value}
-      checked={pState?.choice === 'single' ? value == state?.value : (pState?.values || []).includes(state?.value || '')}
+      checked={pState?.choice === 'single' ? value == state?.value : (pState?.value || []).includes(state?.value || '')}
       onChange={(event) => {
         if (state?.parentId && state?.value) {
           choicesStore.setValues(state?.parentId, state?.value, event.currentTarget.checked ? state?.value || '' : '');

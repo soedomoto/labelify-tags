@@ -9,6 +9,7 @@ Registry.registerComponent<TextAreaStore, TextAreaProps>({
   store: textAreaStore as unknown as ComponentStoreInterface<TextAreaStore>,
   view: TextArea,
   config: {
+    isControl: true,
     isObject: false,
     autoInit: true,
   },

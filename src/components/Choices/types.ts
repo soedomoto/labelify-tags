@@ -12,5 +12,5 @@ export type ChoicesProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 export type ChoicesState = BaseStoreState & ChoicesProps & {
-  values?: string[];
+  value?: string[];
 }

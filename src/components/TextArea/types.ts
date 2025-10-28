@@ -11,13 +11,6 @@ export type TextAreaProps = HTMLAttributes<HTMLDivElement> & {
   rows?: number;
   value?: string;
   style?: string;
-
-  // name="justification" 
-  // toName="video_description" 
-  // editable="true"
-  // placeholder="Please provide the justification for your choice"
-  // maxSubmissions="1"
-  // rows="3"
 }
 
 export type TextAreaState = BaseStoreState & TextAreaProps
