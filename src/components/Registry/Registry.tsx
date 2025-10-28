@@ -199,7 +199,10 @@ class CRegistry {
         origin: string;
       }> = {};
       for (const key of Object.keys(components)) {
-        const store = components[key].store;
+        const comp = components[key];
+        if (!comp?.config?.isControl) continue;
+
+        const store = comp.store;
         const instances = this.store.get(store.instances);
         for (const instanceKey of Object.keys(instances)) {
           store.subscribe(instanceKey, (s) => {
@@ -209,7 +212,7 @@ class CRegistry {
               "id": randomId(),
               "from_name": state.name,
               "to_name": state.toName,
-              "type": components[key].tag.toLowerCase(),
+              "type": comp.tag.toLowerCase(),
               "origin": "manual"
             };
             callback(allInstances);
