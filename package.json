@@ -1,6 +1,6 @@
 {
   "name": "@labelify/tags",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "main": "./dist/labelify-tags.umd.js",
   "module": "./dist/labelify-tags.es.js",
