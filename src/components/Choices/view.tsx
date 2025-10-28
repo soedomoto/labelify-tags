@@ -1,10 +1,10 @@
 import { htmlStyleToReactStyle } from '@/.';
 import { Group, Stack } from '@mantine/core';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { ChoicesProps, ChoicesState, choicesStore } from '.';
+import { ChoicesProps, ChoicesRegistration, choicesStore } from '.';
 
 function Component({ id }: { id: string }) {
-  const [state, setState] = useState<ChoicesState>();
+  const [state, setState] = useState<ChoicesRegistration>();
 
   useEffect(() => {
     setState(choicesStore.getInstance(id));
@@ -28,8 +28,9 @@ export function Choices({ id, parentId, style, name, toName, choice, showInLine,
       choice,
       showInLine,
       reactStyle,
-      props,
       children,
+      props,
+      visible: true,
     });
   }, [id, parentId, name, toName, choice, showInLine, reactStyle, props, children]);
 

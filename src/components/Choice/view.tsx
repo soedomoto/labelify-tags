@@ -1,11 +1,11 @@
-import { ChoicesState, choicesStore, htmlStyleToReactStyle } from '@/.';
+import { ChoicesRegistration, choicesStore, htmlStyleToReactStyle } from '@/.';
 import { Checkbox } from '@mantine/core';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { ChoiceProps, ChoiceState, choiceStore } from '.';
+import { ChoiceProps, ChoiceRegistration, choiceStore } from '.';
 
 function Component({ id }: { id: string }) {
-  const [state, setState] = useState<ChoiceState>();
-  const [pState, setPState] = useState<ChoicesState>();
+  const [state, setState] = useState<ChoiceRegistration>();
+  const [pState, setPState] = useState<ChoicesRegistration>();
 
   useEffect(() => {
     return choiceStore.subscribe(id, (state) => setState(state))
@@ -48,6 +48,7 @@ export function Choice({ id, parentId, style, value, children, ...props }: Props
       reactStyle,
       props,
       children,
+      visible: true,
     });
   }, [id, parentId, value, reactStyle, props, children]);
 

@@ -1,30 +1,32 @@
-import { TextAreaState } from '.';
+import { TextAreaRegistration } from '.';
 import { SupportedTypes } from '../Base/types';
 import { AbstractComponentStore } from '../Registry';
 
-type TextAreaActions = {
-  register(id: string, state: TextAreaState): () => void
-  unregister(id: string): void;
-  getInstance(id: string): TextAreaState | undefined;
-}
-
-export type TextAreaStore = { type: SupportedTypes, instances?: Record<string, TextAreaState> } & TextAreaActions;
-
-const createInitialState = (): TextAreaState => ({
+const createInitialState = (): TextAreaRegistration => ({
   type: 'TextArea',
   id: '',
   name: '',
+  toName: '',
   visible: true,
+  value: '',
 });
 
-export const textAreaStore = (new class StoreClass<TViewStore = TextAreaState> extends AbstractComponentStore<TViewStore> {
+export const textAreaStore = (new class StoreClass<TViewStore = TextAreaRegistration> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }
 
   register(id: string, state: TViewStore): () => void {
     this.store.set(this.instances, (instances) => {
-      return { ...instances, [id]: { ...createInitialState(), ...state } };
+      return {
+        ...instances, [id]: {
+          ...createInitialState(),
+          ...state,
+          getFormattedValue: () => {
+            return { 'text': (this.store.get(this.instances)?.[id] as TextAreaRegistration)?.value || [] };
+          }
+        }
+      };
     });
 
     return () => this.unregister(id);

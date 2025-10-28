@@ -1,8 +1,31 @@
+import { randomId } from "@mantine/hooks";
 import { atom, createStore, PrimitiveAtom } from "jotai";
-import { ComponentType, JSX } from "react";
-import { SupportedTypes } from "../Base/types";
 import merge from "lodash/merge";
+import { ComponentType, CSSProperties, JSX } from "react";
+import { SupportedTypes } from "../Base/types";
 
+export interface BaseObjectProps {
+  id: string;
+  parentId?: string;
+  style?: string;
+  children?: JSX.Element | JSX.Element[] | string;
+}
+
+export interface BaseObjectState {
+  type: SupportedTypes;
+  visible: boolean,
+  reactStyle?: CSSProperties | undefined;
+  props?: Record<string, unknown>;
+}
+
+export interface BaseControlProps extends BaseObjectProps {
+  name: string;
+  toName: string;
+}
+
+export interface BaseControlState extends BaseObjectState, BaseControlProps {
+  getFormattedValue: () => Record<string, any>;
+}
 export interface ComponentStore<TViewStore = unknown> {
   type: SupportedTypes;
   instances: PrimitiveAtom<Record<string, TViewStore>>;
@@ -35,19 +58,19 @@ export abstract class AbstractComponentStore<TViewStore> implements ComponentSto
   getInstance(id: string): TViewStore | undefined {
     return this.store.get(this.instances)[id];
   }
-  
+
   getInstanceKeys(): string[] {
-    return Object.keys(this.store.get(this.instances) || { });
+    return Object.keys(this.store.get(this.instances) || {});
   }
 
   getInstances(): (TViewStore | undefined)[] {
-    const instances = this.store.get(this.instances) || { };
+    const instances = this.store.get(this.instances) || {};
     return Object.keys(instances).map((key) => instances[key] as TViewStore);
   }
 }
 
 export interface ComponentDefinition<TViewStore = unknown, TViewProps = unknown> {
-  tag: string;
+  tag: SupportedTypes;
   store: ComponentStore<TViewStore>;
   view: ComponentType<TViewProps>;
 
@@ -163,9 +186,8 @@ class CRegistry {
     for (const comp of components) {
       if (!comp?.config?.isControl) continue;
 
-      for (const instance of comp?.store?.getInstances()) {
-        // @ts-expect-error ts-ignore
-        values[instance?.id || ''] = instance?.value;
+      for (const instance of comp?.store?.getInstances() as BaseControlState[]) {
+        values[instance?.id || ''] = { "value": instance.getFormattedValue(), "id": randomId(), "from_name": instance?.name, "to_name": instance?.toName, "type": comp?.tag?.toLowerCase(), "origin": "manual" };
       }
     }
 

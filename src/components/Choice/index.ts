@@ -1,11 +1,11 @@
 import { ComponentStore, Registry } from '../Registry';
-import { ChoiceStore, choiceStore } from './model';
+import { choiceStore } from './model';
 import { ChoiceProps } from './types';
 import { Choice } from './view';
 
-Registry.registerComponent<ChoiceStore, ChoiceProps>({
+Registry.registerComponent<typeof choiceStore, ChoiceProps>({
   tag: 'Choice',
-  store: choiceStore as unknown as ComponentStore<ChoiceStore>,
+  store: choiceStore as unknown as ComponentStore<typeof choiceStore>,
   view: Choice,
   config: {
     isObject: false,

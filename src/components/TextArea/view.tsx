@@ -1,10 +1,10 @@
 import { htmlStyleToReactStyle } from '@/.';
 import { Textarea as MTextArea } from '@mantine/core';
 import { PropsWithChildren, useEffect, useState } from 'react';
-import { TextAreaProps, TextAreaState, textAreaStore } from '.';
+import { TextAreaProps, TextAreaRegistration, textAreaStore } from '.';
 
 function Component({ id }: { id: string }) {
-  const [state, setState] = useState<TextAreaState>();
+  const [state, setState] = useState<TextAreaRegistration>();
 
   useEffect(() => {
     return textAreaStore.subscribe(id, (state) => setState(state))

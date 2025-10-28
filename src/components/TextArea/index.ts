@@ -1,12 +1,12 @@
 import { ComponentStore, Registry } from '../Registry';
-import { textAreaStore, TextAreaStore } from './model';
+import { textAreaStore } from './model';
 import { TextAreaProps } from './types';
 import { TextArea } from './view';
 
 
-Registry.registerComponent<TextAreaStore, TextAreaProps>({
+Registry.registerComponent<typeof textAreaStore, TextAreaProps>({
   tag: 'TextArea',
-  store: textAreaStore as unknown as ComponentStore<TextAreaStore>,
+  store: textAreaStore as unknown as ComponentStore<typeof textAreaStore>,
   view: TextArea,
   config: {
     isControl: true,

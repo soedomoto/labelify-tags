@@ -1,30 +1,31 @@
-import { ChoicesState } from '.';
+import { ChoicesRegistration, ChoicesState } from '.';
 import { SupportedTypes } from '../Base/types';
 import { AbstractComponentStore } from '../Registry';
 
-type ChoicesActions = {
-  register(id: string, state: ChoicesState): () => void
-  unregister(id: string): void;
-  getInstance(id: string): ChoicesState | undefined;
-}
-
-export type ChoicesStore = { type: SupportedTypes, instances?: Record<string, ChoicesState> } & ChoicesActions;
-
-const createInitialState = (): ChoicesState => ({
+const createInitialState = (): ChoicesRegistration => ({
   type: 'Choices',
   id: '',
   name: '',
+  toName: '',
   visible: true,
 });
 
-export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> extends AbstractComponentStore<TViewStore> {
+export const choicesStore = (new class StoreClass<TViewStore = ChoicesRegistration> extends AbstractComponentStore<TViewStore> {
   constructor() {
     super();
   }
-  
+
   register(id: string, state: TViewStore): () => void {
     this.store.set(this.instances, (instances) => {
-      return { ...instances, [id]: { ...createInitialState(), ...state } };
+      return {
+        ...instances, [id]: {
+          ...createInitialState(),
+          ...state,
+          getFormattedValue: () => {
+            return { 'choices': (this.store.get(this.instances)?.[id] as ChoicesState)?.value || [] };
+          }
+        }
+      };
     });
 
     return () => this.unregister(id);
@@ -53,12 +54,12 @@ export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> ext
       }
 
       return {
-          ...instances,
-          [id]: {
-            ...instances[id],
-            value: values,
-          } as TViewStore,
-        };
+        ...instances,
+        [id]: {
+          ...instances[id],
+          value: values,
+        } as TViewStore,
+      };
     });
   }
 });
