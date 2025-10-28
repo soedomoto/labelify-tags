@@ -38,10 +38,6 @@ export const hyperTextStore = (new class StoreClass<TViewStore = HyperTextState>
     });
   }
 
-  getInstance(id: string): TViewStore | undefined {
-    return this.store.get(this.instances)[id];
-  }
-
   subscribe(id: string, callback: (state: TViewStore | undefined) => void) {
     return this.store.sub(this.instances, () => {
       callback(this.store.get(this.instances)?.[id]);

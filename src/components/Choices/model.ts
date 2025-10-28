@@ -38,10 +38,6 @@ export const choicesStore = (new class StoreClass<TViewStore = ChoicesState> ext
     });
   }
 
-  getInstance(id: string): TViewStore | undefined {
-    return this.store.get(this.instances)?.[id];
-  }
-
   subscribe(id: string, callback: (state: TViewStore | undefined) => void) {
     return this.store.sub(this.instances, () => {
       const value = this.store.get(this.instances)?.[id];

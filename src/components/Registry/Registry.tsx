@@ -15,12 +15,6 @@ export interface ComponentStore<TViewStore = unknown> {
   getInstances(): (TViewStore | undefined)[]
 }
 export abstract class AbstractComponentStore<TViewStore> implements ComponentStore<TViewStore> {
-  getInstanceKeys(): string[] {
-    throw new Error("Method not implemented.");
-  }
-  getInstances(): (TViewStore | undefined)[] {
-    throw new Error("Method not implemented.");
-  }
   public type: SupportedTypes = 'View';
   public instances = atom<Record<string, TViewStore>>({});
 
@@ -34,17 +28,21 @@ export abstract class AbstractComponentStore<TViewStore> implements ComponentSto
   unregister(id: string): void {
     throw new Error('Method not implemented.');
   }
-  getInstance(id: string): TViewStore | undefined {
-    throw new Error('Method not implemented.');
-  }
   subscribe(id: string, callback: (state: TViewStore | undefined) => void): () => void {
     throw new Error('Method not implemented.');
   }
-  getinstanceKeys(): string[] {
-    throw new Error("Method not implemented.");
+
+  getInstance(id: string): TViewStore | undefined {
+    return this.store.get(this.instances)[id];
   }
-  getinstances(): (TViewStore | undefined)[] {
-    throw new Error("Method not implemented.");
+  
+  getInstanceKeys(): string[] {
+    return Object.keys(this.store.get(this.instances) || { });
+  }
+
+  getInstances(): (TViewStore | undefined)[] {
+    const instances = this.store.get(this.instances) || { };
+    return Object.keys(instances).map((key) => instances[key] as TViewStore);
   }
 }
 
