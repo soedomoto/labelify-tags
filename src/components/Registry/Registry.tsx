@@ -181,7 +181,14 @@ class CRegistry {
   }
 
   public getInstancesValues() {
-    let values: Record<string, unknown> = {};
+    let values: Record<string, {
+      value: Record<string, any>;
+      id: string;
+      from_name: string;
+      to_name: string;
+      type: string;
+      origin: string;
+    }> = {};
     const components = this.getAllComponents();
     for (const comp of components) {
       if (!comp?.config?.isControl) continue;
