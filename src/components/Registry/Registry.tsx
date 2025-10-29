@@ -1,7 +1,9 @@
 import { randomId } from "@mantine/hooks";
 import { atom, createStore, PrimitiveAtom } from "jotai";
+import debounce from "lodash/debounce";
+import isEqual from "lodash/isEqual";
 import merge from "lodash/merge";
-import { ComponentType, CSSProperties, JSX } from "react";
+import { ComponentType, CSSProperties, JSX, useEffect, useState } from "react";
 import { SupportedTypes } from "../Base/types";
 
 export interface BaseObjectProps {
@@ -24,6 +26,8 @@ export interface BaseControlProps extends BaseObjectProps {
 }
 
 export interface BaseControlState extends BaseObjectState, BaseControlProps {
+  formattedValue?: Record<string, any>;
+  setFormattedValue: (value: Record<string, any>) => void;
   getFormattedValue: () => Record<string, any>;
 }
 export interface ComponentStore<TViewStore = unknown> {
@@ -120,6 +124,15 @@ export type RegistryEvent =
     timestamp: number;
   };
 
+export interface InstanceValue {
+  value: Record<string, any>;
+  id: string;
+  from_name: string;
+  to_name: string;
+  type: string;
+  origin: string;
+}
+
 class CRegistry {
   public store = createStore();
   private components = atom<Record<string, ComponentDefinition<unknown, unknown>>>({});
@@ -180,58 +193,56 @@ class CRegistry {
     return Object.keys(this.store.get(this.components));
   }
 
-  public subscribeInstancesChanges(callback: (instances: Record<string, {
-    value: Record<string, any>;
-    id: string;
-    from_name: string;
-    to_name: string;
-    type: string;
-    origin: string;
-  }>) => void): () => void {
-    return this.store.sub(this.components, () => {
-      const components = this.store.get(this.components);
-      const allInstances: Record<string, {
-        value: Record<string, any>;
-        id: string;
-        from_name: string;
-        to_name: string;
-        type: string;
-        origin: string;
-      }> = {};
-      for (const key of Object.keys(components)) {
-        const comp = components[key];
-        if (!comp?.config?.isControl) continue;
+  public subscribeInstancesValuesChanges(callback: (instances: Record<string, InstanceValue>) => void): () => void {
+    let allSubscriptions: (() => void)[] = [];
+    const allInstancesValue: Record<string, InstanceValue> = {};
 
-        const store = comp.store;
-        const instances = this.store.get(store.instances);
-        for (const instanceKey of Object.keys(instances)) {
-          store.subscribe(instanceKey, (s) => {
-            const state = s as BaseControlState;
-            allInstances[instanceKey] = {
-              "value": state.getFormattedValue(),
-              "id": randomId(),
-              "from_name": state.name,
-              "to_name": state.toName,
-              "type": comp.tag.toLowerCase(),
-              "origin": "manual"
-            };
-            callback(allInstances);
-          });
+    const debFn = debounce((allInstancesValue) => {
+      callback(allInstancesValue);
+    }, 100);
+
+    const instances: Record<string, unknown> = {};
+    const updateInstances = (comp: ComponentDefinition<unknown, unknown>, instanceId: string, instance: unknown) => {
+      if (Object.keys(instances).includes(instanceId)) return;
+      instances[instanceId] = instance;
+
+      const subscription = comp.store.subscribe(instanceId, (s) => {
+        const state = s as BaseControlState;
+        allInstancesValue[instanceId] = {
+          "value": state.getFormattedValue(),
+          "id": "",
+          "from_name": state.name,
+          "to_name": state.toName,
+          "type": comp.tag.toLowerCase(),
+          "origin": "manual"
+        };
+
+        debFn(allInstancesValue);
+      });
+      allSubscriptions.push(subscription);
+    }
+
+    const components = this.getAllComponents();
+    for (const comp of components) {
+      if (!comp?.config?.isControl) continue;
+
+      const subscription = this.store.sub(comp.store.instances, () => {
+        const instances = this.store.get(comp.store.instances);
+        for (const instanceId in instances) {
+          updateInstances(comp, instanceId, instances[instanceId]);
         }
-      }
-      callback(allInstances);
-    });
+      });
+
+      allSubscriptions.push(subscription);
+    }
+
+    return () => {
+      for (const unsub of allSubscriptions) unsub();
+    };
   }
 
   public getInstancesValues() {
-    let values: Record<string, {
-      value: Record<string, any>;
-      id: string;
-      from_name: string;
-      to_name: string;
-      type: string;
-      origin: string;
-    }> = {};
+    let values: Record<string, InstanceValue> = {};
     const components = this.getAllComponents();
     for (const comp of components) {
       if (!comp?.config?.isControl) continue;
@@ -246,3 +257,20 @@ class CRegistry {
 }
 
 export const Registry = new CRegistry();
+export const getInstancesValues = Registry.getInstancesValues.bind(Registry);
+export const subscribeInstancesValuesChanges = Registry.subscribeInstancesValuesChanges.bind(Registry);
+
+export function useSubscribeInstancesChanges() {
+  const [values, setValues] = useState<Record<string, InstanceValue>>({});
+  useEffect(() => {
+    return subscribeInstancesValuesChanges(_values => {
+      console.log('isEqual', isEqual(_values, values), _values, values);
+      console.log('isEqual', JSON.stringify(_values) == JSON.stringify(values), _values, values);
+
+      // if (!isEqual(_values, values)) {
+      //   setValues({ ..._values });
+      // }
+    });
+  }, [values]);
+  return values;
+}

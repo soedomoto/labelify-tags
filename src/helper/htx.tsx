@@ -1,4 +1,4 @@
-import { Registry } from "@/.";
+import { BaseControlState, Registry } from "@/.";
 import { MantineProvider } from "@mantine/core";
 import { randomId } from "@mantine/hooks";
 import { parseDocument } from "htmlparser2";
@@ -30,10 +30,8 @@ export function parseHtxString(htxString: string = "<View>\n <View style=\"box-s
   return document.children.map(transformNode).filter(Boolean);
 }
 
-function renderHtxElement(element: HtxElement, values: Record<string, any> = {}, key?: Key, parentId?: string): React.ReactNode {
+function renderHtxElement(element: HtxElement, context: Record<string, any>, defaultValues: Record<string, Record<string, any>>, key?: Key, parentId?: string): React.ReactNode {
   let { type, props = {}, children } = element;
-
-  const view = Registry.getComponentView(type) || type;
   const id = props?.name || randomId(`${type}-`);
 
   props.id = id;
@@ -41,31 +39,36 @@ function renderHtxElement(element: HtxElement, values: Record<string, any> = {},
   for (const prop in props) {
     if (typeof props[prop] === 'string' && props[prop].startsWith('$')) {
       const valueKey = props[prop].slice(1);
-      props[prop] = values[valueKey] || '';
+      props[prop] = context[valueKey] || '';
+    }
+  }
+
+  for (const instanceId in defaultValues) {
+    if (instanceId == id) {
+      props = { ...props, ...defaultValues[instanceId] };
     }
   }
 
   let reactChildren: string | ReactNode[];
   if (Array.isArray(children)) {
-    reactChildren = children.map((child, idx) => (typeof child === "string" ? child : renderHtxElement(child, values, idx, id)))
+    reactChildren = children.map((child, idx) => (typeof child === "string" ? child : renderHtxElement(child, context, defaultValues, idx, id)))
   } else {
     reactChildren = children;
   }
 
-  // console.log(`Rendering element: ${type}`, id, parentId, props, reactChildren.length);
+  const comp = Registry.getComponent(type);
+  const view = comp?.view || type;
+
   return createElement(view, { key, ...props }, reactChildren);
 }
 
-export function renderHtxString(htxString: string, values: Record<string, any> = {}): React.ReactNode {
+export function renderHtxString(htxString: string, context: Record<string, any>, defaultValues: Record<string, Record<string, any>> = {}): React.ReactNode {
   // console.log("Rendering HTX string:", htxString);
   const elements = parseHtxString(htxString);
   // console.log("Parsed HTX elements:", elements);
   return (
     <MantineProvider>
-      {elements.map((e, idx) => renderHtxElement(e, values, idx))}
+      {elements.map((e, idx) => renderHtxElement(e, context, defaultValues, idx))}
     </MantineProvider>
   );
 }
-
-export const getInstancesValues = Registry.getInstancesValues;
-export const subscribeInstancesChanges = Registry.subscribeInstancesChanges;

@@ -1,5 +1,4 @@
-import { BaseStoreState } from "../Base/types";
-import { BaseControlProps } from "../Registry";
+import { BaseControlProps, BaseControlState } from "../Registry";
 
 // name	string		Name of the element
 // toName	string		Name of the element that you want to label
@@ -35,8 +34,9 @@ export interface TextAreaProps extends BaseControlProps {
   perItem?: 'true' | 'false';
 }
 
-export type TextAreaState = BaseStoreState & TextAreaProps & {
+export interface TextAreaState extends TextAreaProps, BaseControlState {
+  formattedValue?: { 'text': string[] };
   getFormattedValue: () => { 'text': string[] };
 }
 
-export interface TextAreaRegistration extends Omit<TextAreaState, 'getFormattedValue'> {}
+export interface TextAreaRegistration extends Omit<TextAreaState, 'getFormattedValue' | 'setFormattedValue'> {}

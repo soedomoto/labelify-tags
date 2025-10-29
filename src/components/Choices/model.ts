@@ -1,5 +1,4 @@
 import { ChoicesRegistration, ChoicesState } from '.';
-import { SupportedTypes } from '../Base/types';
 import { AbstractComponentStore } from '../Registry';
 
 const createInitialState = (): ChoicesRegistration => ({
@@ -20,10 +19,11 @@ export const choicesStore = (new class StoreClass<TViewStore = ChoicesRegistrati
       return {
         ...instances, [id]: {
           ...createInitialState(),
+          ...(instances[id] || {}),
           ...state,
           getFormattedValue: () => {
             return { 'choices': (this.store.get(this.instances)?.[id] as ChoicesState)?.value || [] };
-          }
+          },
         }
       };
     });

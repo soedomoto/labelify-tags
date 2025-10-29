@@ -26,6 +26,11 @@ function Component({ id }: { id: string }) {
 
 export function TextArea({ id, style, value, name, toName, editable, placeholder, maxSubmissions, rows, children, ...props }: PropsWithChildren<TextAreaProps>) {
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
+  const { formattedValue } = (props || {}) as any;
+
+  if (Array.isArray(formattedValue?.value?.text)) {
+    value = formattedValue.value.text;
+  }
 
   useEffect(() => {
     textAreaStore.register(id, {
@@ -41,6 +46,8 @@ export function TextArea({ id, style, value, name, toName, editable, placeholder
       reactStyle,
       props,
       children,
+      formattedValue,
+      visible: true,
     });
   }, [id, value, name, reactStyle, props, children]);
 

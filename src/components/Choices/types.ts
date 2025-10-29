@@ -33,7 +33,8 @@ export interface ChoicesProps extends BaseControlProps {
 
 export interface ChoicesState extends ChoicesProps, BaseControlState {
   value?: string[];
+  formattedValue?: { 'choices': string[] };
   getFormattedValue: () => { 'choices': string[] };
 }
 
-export interface ChoicesRegistration extends Omit<ChoicesState, 'getFormattedValue'> {}
+export interface ChoicesRegistration extends Omit<ChoicesState, 'getFormattedValue' | 'setFormattedValue'> {}

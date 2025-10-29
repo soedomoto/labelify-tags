@@ -17,6 +17,12 @@ function Component({ id }: { id: string }) {
 
 export function Choices({ id, parentId, style, name, toName, choice, showInLine, children, ...props }: PropsWithChildren<ChoicesProps>) {
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
+  const { formattedValue } = (props || {}) as any;
+
+  let value = undefined;
+  if (Array.isArray(formattedValue?.value?.choices)) {
+    value = formattedValue.value.choices;
+  }
 
   useEffect(() => {
     choicesStore.register(id, {
@@ -30,6 +36,7 @@ export function Choices({ id, parentId, style, name, toName, choice, showInLine,
       reactStyle,
       children,
       props,
+      value,
       visible: true,
     });
   }, [id, parentId, name, toName, choice, showInLine, reactStyle, props, children]);

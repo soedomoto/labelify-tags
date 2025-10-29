@@ -1,5 +1,4 @@
 import { TextAreaRegistration } from '.';
-import { SupportedTypes } from '../Base/types';
 import { AbstractComponentStore } from '../Registry';
 
 const createInitialState = (): TextAreaRegistration => ({
@@ -24,7 +23,7 @@ export const textAreaStore = (new class StoreClass<TViewStore = TextAreaRegistra
           ...state,
           getFormattedValue: () => {
             return { 'text': (this.store.get(this.instances)?.[id] as TextAreaRegistration)?.value || [] };
-          }
+          },
         }
       };
     });
