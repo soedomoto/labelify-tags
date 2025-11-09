@@ -43,4 +43,17 @@ export const viewStore = (new class StoreClass<TViewStore = ViewState> extends A
       callback(this.store.get(this.instances)?.[id]);
     });
   }
+
+  setPropValue(id: string, prop: keyof TViewStore, value: unknown) {
+    console.log('Setting View prop value', id, prop, value);
+    this.store.set(this.instances, (instances: Record<string, TViewStore>) => {
+      return {
+        ...instances,
+        [id]: {
+          ...instances[id],
+          [prop]: value,
+        } as TViewStore,
+      };
+    });
+  }
 });
