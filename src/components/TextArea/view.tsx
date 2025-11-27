@@ -30,7 +30,10 @@ export function TextArea({ id, style, name, toName, editable, placeholder, maxSu
 
   let value = undefined;
   if (Array.isArray(formattedValue?.value?.text)) {
-    value = formattedValue.value.text;
+    const [_value] = formattedValue.value.text;
+    value = _value;
+  } else {
+    value = formattedValue?.value?.text;
   }
 
   useEffect(() => {
