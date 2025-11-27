@@ -53,6 +53,7 @@ export function TextArea({ id, style, name, toName, editable, placeholder, maxSu
       formattedValue,
       visible: true,
     });
+    return () => textAreaStore.unregister(id);
   }, [id, value, name, reactStyle, props, children]);
 
   return <Component id={id} />;

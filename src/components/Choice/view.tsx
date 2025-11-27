@@ -50,6 +50,7 @@ export function Choice({ id, parentId, style, value, children, ...props }: Props
       children,
       visible: true,
     });
+    return () => choiceStore.unregister(id);
   }, [id, parentId, value, reactStyle, props, children]);
 
   return <Component id={id} />;

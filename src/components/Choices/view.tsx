@@ -39,6 +39,7 @@ export function Choices({ id, parentId, style, name, toName, choice, showInLine,
       value,
       visible: true,
     });
+    return () => choicesStore.unregister(id);
   }, [id, parentId, name, toName, choice, showInLine, reactStyle, props, children]);
 
   return <Component id={id} />;
