@@ -24,7 +24,10 @@ function Component({ id }: { id: string }) {
   />;
 }
 
-export function TextArea({ id, style, name, toName, editable, placeholder, maxSubmissions, rows, children, ...props }: PropsWithChildren<TextAreaProps>) {
+export function TextArea(allProps: PropsWithChildren<TextAreaProps>) {
+  console.log('TextArea allProps:', allProps);
+
+  const { id, style, name, toName, editable, placeholder, maxSubmissions, rows, children, ...props } = allProps;
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
   const { formattedValue } = (props || {}) as any;
 
