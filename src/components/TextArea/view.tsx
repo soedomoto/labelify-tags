@@ -25,8 +25,6 @@ function Component({ id }: { id: string }) {
 }
 
 export function TextArea(allProps: PropsWithChildren<TextAreaProps>) {
-  console.log('TextArea allProps:', allProps);
-
   const { id, style, name, toName, editable, placeholder, maxSubmissions, rows, children, ...props } = allProps;
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
   const { formattedValue } = (props || {}) as any;
@@ -34,10 +32,13 @@ export function TextArea(allProps: PropsWithChildren<TextAreaProps>) {
   let value = undefined;
   if (Array.isArray(formattedValue?.value?.text)) {
     const [_value] = formattedValue.value.text;
-    value = _value;
+    value = _value || '';
   } else {
     value = formattedValue?.value?.text;
   }
+
+  console.log('TextArea allProps:', allProps);
+  console.log('TextArea value:', value);
 
   useEffect(() => {
     textAreaStore.register(id, {
