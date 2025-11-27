@@ -19,7 +19,7 @@ function Component({ id }: { id: string }) {
     style={state?.reactStyle}
     value={state?.value}
     onChange={(e) => {
-      if (state) state.value = e.target.value;
+      textAreaStore.setValues(id, e.target.value);
     }}
   />;
 }

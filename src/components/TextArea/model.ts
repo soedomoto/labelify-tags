@@ -1,4 +1,4 @@
-import { TextAreaRegistration } from '.';
+import { TextAreaRegistration, TextAreaState } from '.';
 import { AbstractComponentStore } from '../Registry';
 
 const createInitialState = (): TextAreaRegistration => ({
@@ -42,6 +42,18 @@ export const textAreaStore = (new class StoreClass<TViewStore = TextAreaRegistra
   subscribe(id: string, callback: (state: TViewStore | undefined) => void) {
     return this.store.sub(this.instances, () => {
       callback(this.store.get(this.instances)?.[id]);
+    });
+  }
+
+  setValues(id: string, value: string) {
+    this.store.set(this.instances, (instances: Record<string, TViewStore>) => {
+      return {
+        ...instances,
+        [id]: {
+          ...instances[id],
+          value: value,
+        } as TViewStore,
+      };
     });
   }
 });
