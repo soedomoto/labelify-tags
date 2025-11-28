@@ -34,7 +34,7 @@ export function TextArea(allProps: PropsWithChildren<TextAreaProps>) {
     const [_value] = formattedValue.value.text;
     value = _value || '';
   } else {
-    value = formattedValue?.value?.text;
+    value = formattedValue?.value?.text || '';
   }
 
   console.log('TextArea allProps:', allProps);

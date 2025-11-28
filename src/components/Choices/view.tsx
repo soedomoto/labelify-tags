@@ -19,7 +19,7 @@ export function Choices({ id, parentId, style, name, toName, choice, showInLine,
   const reactStyle = typeof style === 'string' ? htmlStyleToReactStyle(style) : style;
   const { formattedValue } = (props || {}) as any;
 
-  let value = undefined;
+  let value = [];
   if (Array.isArray(formattedValue?.value?.choices)) {
     value = formattedValue.value.choices;
   }
