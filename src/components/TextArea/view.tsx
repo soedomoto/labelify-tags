@@ -37,9 +37,6 @@ export function TextArea(allProps: PropsWithChildren<TextAreaProps>) {
     value = formattedValue?.value?.text || '';
   }
 
-  console.log('TextArea allProps:', allProps);
-  console.log('TextArea value:', value);
-
   useEffect(() => {
     textAreaStore.register(id, {
       type: 'TextArea',
