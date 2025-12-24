@@ -12,7 +12,7 @@ function Component({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => {
-    if (state?.visibleWhen == 'choice-selected' && state?.whenTagName) {
+    if (state?.visibleWhen && state?.whenTagName) {
       setChoicesState(choicesStore.getInstance(state?.whenTagName));
       return choicesStore.subscribe(state?.whenTagName || '', (pState) => setChoicesState(pState));
     }
