@@ -19,7 +19,14 @@ function Component({ id }: { id: string }) {
   }, [state?.visibleWhen, state?.whenTagName]);
 
   let visible = true;
-  if ((state?.visibleWhen == 'choice-selected')) visible = (choicesState?.value || []).includes(state?.whenChoiceValue || '--missing--');
+  const whenChoiceValues = (state?.whenChoiceValue || '').split(',').map(v => v.trim() || '--missing--');
+  if (state?.visibleWhen == 'choice-selected') {
+    // visible = (choicesState?.value || []).includes(state?.whenChoiceValue || '--missing--');
+    visible = (choicesState?.value || []).some(v => whenChoiceValues.includes(v));
+  } else if (state?.visibleWhen == 'choice-unselected') {
+    // visible = !(choicesState?.value || []).includes(state?.whenChoiceValue || '--missing--');
+    visible = !(choicesState?.value || []).some(v => whenChoiceValues.includes(v));
+  }
 
   // useEffect(() => {
   //   console.log(id, state?.whenTagName, state?.visible, visible);
