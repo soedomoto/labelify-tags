@@ -28,6 +28,8 @@ function Component({ id }: { id: string }) {
     visible = !(choicesState?.value || []).some(v => whenChoiceValues.includes(v));
   }
 
+  console.log('View', id, state?.visibleWhen, whenChoiceValues, choicesState?.value, visible);
+
   // useEffect(() => {
   //   console.log(id, state?.whenTagName, state?.visible, visible);
   //   viewStore.setPropValue(id, 'visible', visible);
