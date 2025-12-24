@@ -21,14 +21,10 @@ function Component({ id }: { id: string }) {
   let visible = true;
   const whenChoiceValues = (state?.whenChoiceValue || '').split(',').map(v => v.trim() || '--missing--');
   if (state?.visibleWhen == 'choice-selected') {
-    // visible = (choicesState?.value || []).includes(state?.whenChoiceValue || '--missing--');
     visible = (choicesState?.value || []).some(v => whenChoiceValues.includes(v));
   } else if (state?.visibleWhen == 'choice-unselected') {
-    // visible = !(choicesState?.value || []).includes(state?.whenChoiceValue || '--missing--');
     visible = !(choicesState?.value || []).some(v => whenChoiceValues.includes(v));
   }
-
-  console.log('View', id, state?.visibleWhen, whenChoiceValues, choicesState?.value, visible);
 
   // useEffect(() => {
   //   console.log(id, state?.whenTagName, state?.visible, visible);
